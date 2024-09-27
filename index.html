@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<!--Add HTML canvas element to the page -->
+<canvas id="canvas" width="400" height=400"
+style="background-color:#333">
+</canvas>
+
+<script>
+
+<!--Create canvas object from HTML canvas element -->
+var canvas = document.getElementById("canvas");
+
+<!--Create a second drawing object -->
+var ctx = canvas.getContext("2d");
+
+<!-- Make size of clock match canvas -->
+var radius = canvas.height / 2;
+
+<!-- Move clock to center of canvas -->
+ctx.translate(radius, radius);
+
+<!-- Scale down clock to leave margin -->
+radius = radius * 0.90
+
+setInterval(drawClock,1000)
+
+  
+drawClock();
+
+function drawClock() {
+  drawFace(ctx, radius);
+  drawNumbers(ctx, radius);
+  drawTime(ctx,radius,radius*0.8, radius*0.07)
+}
+
+  
+function drawFace(ctx, radius) {
+  var grad;
+
+<!--Draw white background of clock -->
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, 2*Math.PI);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+
+<!-- Draw inner circle of clock -->  
+  grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
+  grad.addColorStop(0, '#333');
+  grad.addColorStop(0.5, 'white');
+  grad.addColorStop(1, '#333');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = radius*0.1;
+  ctx.stroke();
+
+<!-- Draw small circle at center of clock -->
+  ctx.beginPath();
+  ctx.arc(0, 0, radius*0.1, 0, 2*Math.PI);
+  ctx.fillStyle = '#333';
+  ctx.fill();
+}
+
+function drawNumbers(ctx, radius) {
+  var ang;
+  var num;
+  ctx.font = radius*0.15 + "px arial";
+  ctx.textBaseline="middle";
+  ctx.textAlign="center";
+  for(num = 1; num < 13; num++){
+    ang = num *2 * Math.PI / 12;
+    ctx.rotate(ang);
+    ctx.translate(0, -radius*0.85);
+    ctx.rotate(-ang);
+    ctx.fillText(num.toString(), 0, 0);
+    ctx.rotate(ang);
+    ctx.translate(0, radius*0.85);
+    ctx.rotate(-ang);
+  }
+}
+
+function drawHand(ctx, pos, length, width) {
+  ctx.beginPath();
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.moveTo(0,0);
+  ctx.rotate(pos);
+  ctx.lineTo(0, -length);
+  ctx.stroke();
+  ctx.rotate(-pos);
+}
+
+function drawTime(ctx, radius){
+<!-- Get current date and time -->
+    var now = new Date();
+    var hour = now.getHours();
+    var minute = now.getMinutes();
+    var second = now.getSeconds();
+    var c_ang = 2*Math.PI
+  
+    //hour -- set the hour  
+    hour=hour%12;
+    hour=(hour*c_ang/12)+
+    (minute*c_ang/(12*60))+
+    (second*c_ang/(720*60));
+    drawHand(ctx, hour, radius*0.5, radius*0.07);
+    //minute
+    minute=minute%60
+    minute =c_ang*minute/60;
+    drawHand(ctx, minute, radius*0.8, radius*0.07);
+    // second
+    second=second%60
+   second=c_ang*second/60;
+    drawHand(ctx, second, radius*0.9, radius*0.02);
+}
+</script>
+
+</body>
+</html>
